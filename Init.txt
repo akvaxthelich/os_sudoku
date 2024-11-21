@@ -1,0 +1,5 @@
+Sudoku.java, Server.java, Client.java, A populated README.md
+
+25 of 81 spots are empty
+
+User types in IP address and port number
