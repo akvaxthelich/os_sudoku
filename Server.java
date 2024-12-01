@@ -62,7 +62,9 @@ class ClientHandler extends Thread{ //we anticipate multiple clients... thus we 
             }
             while((message = inStream.readLine()) != null && !message.equals("exit")){ //read from client            
                 System.out.println(username + "> " + message);
-                pOut.println("You said: " + message); //TODO handle clientside response.
+                
+                //need arraylist tracking all users here to broadcast, otherwise this will only be sent to one client
+                pOut.println(username + "> " + message); //TODO half done, currently users cannot see other user messages.
             }
 
         }
