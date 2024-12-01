@@ -179,9 +179,13 @@ public class Sudoku {
 	}
 	
 	// Fill in sudoku by user
+
+	//enterNumber(2,3,4)
+	// colStart = Math.floor(2/9); = 0
 	public boolean enterNumber(int i, int j, int num) {
-		int colStart = (int) Math.floor(i / N);
-		int rowStart = (int) Math.floor(j / N);
+		int colStart = SRN * (int) Math.floor(i / SRN);
+		int rowStart = SRN * (int) Math.floor(j / SRN);
+		System.out.println("["+i+","+j+"]:"+colStart + "," +rowStart);
 		if(isLocationUpdatable(i, j) && unUsedInBox(rowStart, colStart, num)){
 			if (unUsedInRow(i, num) && unUsedInCol(j, num) && (num >= 0) && (num <= 9)){ 
 				//checks row, col, box to see if num is there plus checks to see if int is between 0 to 9
@@ -205,5 +209,10 @@ public class Sudoku {
 		Sudoku sudoku = new Sudoku();
 		sudoku.fillValues();
 		System.out.println(sudoku.getSudokuString());
+		for(int i = 0;i<9;i++){
+			for(int j=0;j<9;j++){
+				sudoku.enterNumber(i, j, 3);
+			}
+		}
 	}
 }
