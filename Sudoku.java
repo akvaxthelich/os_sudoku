@@ -180,7 +180,16 @@ public class Sudoku {
 	
 	// Fill in sudoku by user
 	public boolean enterNumber(int i, int j, int num) {
-		// WRITE CODE HERE
+		int colStart = Math.floor(i / N);
+		int rowStart = Math.floor(j / N);
+		if(isLocationUpdatable(i, j) && unUsedInBox(rowStart, colStart, num)){
+			//start looking for rowstart and colstart
+			//we know that dividing i by N and flooring returns the index [i] of the leftmost position
+			//of the matrix
+			// the same is true for j.
+
+
+		}
 		return true; // CHANGE RETURN VALUE
 	}
 
