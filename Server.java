@@ -4,18 +4,22 @@ import java.net.*;
 public class Server{
 
     public static void main(String[] args){
-        int port = 8000;
+        int port = Integer.parseInt(args[0]);
 
         try{
             ServerSocket serverSocket = new ServerSocket(port);
-
+            
+            System.out.println("Server successfully started at: " + serverSocket.getInetAddress());
+            
             while(true){
-                    Socket clientSocket = serverSocket.accept();
-                    System.out.println("Connection with: '" + clientSocket.getInetAddress() + "' established.");
+                Socket clientSocket = serverSocket.accept();
+                System.out.println("Connection from client: '" + clientSocket.getInetAddress() + "' established.");
 
-                    new ClientHandler(clientSocket).start(); 
-                    
+                new ClientHandler(clientSocket).start(); 
             }
+                    
+                    
+
             
         }
         catch(IOException e){
@@ -48,11 +52,17 @@ class ClientHandler extends Thread{ //we anticipate multiple clients... thus we 
             String message;
             //will buffer the input from the specified file. 
             //Without buffering, each invocation of read() or readLine() could cause bytes to be read from the file, converted into characters, and then returned, which can be very inefficient. 
+            //username grab
+            String username = "anon";
             
-            while((message = inStream.readLine()) != null){ //read from client
-                System.out.println(message); //
-            
-                pOut.println("You said: " + message);
+            if((message = inStream.readLine()) != null){
+                username = message;
+                System.out.println("Client at " + clientSocket.getInetAddress() + 
+                "chose name '" + username + "'.");
+            }
+            while((message = inStream.readLine()) != null && !message.equals("exit")){ //read from client            
+                System.out.println(username + "> " + message);
+                pOut.println("You said: " + message); //TODO handle clientside response.
             }
 
         }
