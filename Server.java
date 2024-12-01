@@ -70,5 +70,4 @@ class ClientHandler extends Thread{ //we anticipate multiple clients... thus we 
        
     }
     //thread class requires a run() function, and to be called with start elsewhere
-
 }
