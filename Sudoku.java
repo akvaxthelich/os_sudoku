@@ -180,17 +180,24 @@ public class Sudoku {
 	
 	// Fill in sudoku by user
 	public boolean enterNumber(int i, int j, int num) {
-		int colStart = Math.floor(i / N);
-		int rowStart = Math.floor(j / N);
+		int colStart = (int) Math.floor(i / N);
+		int rowStart = (int) Math.floor(j / N);
 		if(isLocationUpdatable(i, j) && unUsedInBox(rowStart, colStart, num)){
+			if (unUsedInRow(i, num) && unUsedInCol(j, num) && (num >= 0) && (num <= 9)){ 
+				//checks row, col, box to see if num is there plus checks to see if int is between 0 to 9
+				mat[i][j] = num; //if it is put it in
+				return true;
+			}
+			else { //if not, you can't enter number
+				return false;
+			}
 			//start looking for rowstart and colstart
 			//we know that dividing i by N and flooring returns the index [i] of the leftmost position
 			//of the matrix
 			// the same is true for j.
 
-
 		}
-		return true; // CHANGE RETURN VALUE
+		return false; // CHANGE RETURN VALUE
 	}
 
 	// Driver code
