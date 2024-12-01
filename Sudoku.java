@@ -183,7 +183,7 @@ public class Sudoku {
 		int colStart = (int) Math.floor(i / N);
 		int rowStart = (int) Math.floor(j / N);
 		if(isLocationUpdatable(i, j) && unUsedInBox(rowStart, colStart, num)){
-			if (unUsedInRow(i, num) && unUsedInCol(j, num) && unUsedInBox( i, j, num) && (num >= 0) && (num <= 9)){ 
+			if (unUsedInRow(i, num) && unUsedInCol(j, num) && (num >= 0) && (num <= 9)){ 
 				//checks row, col, box to see if num is there plus checks to see if int is between 0 to 9
 				mat[i][j] = num; //if it is put it in
 				return true;
