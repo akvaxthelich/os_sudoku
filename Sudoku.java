@@ -157,14 +157,14 @@ public class Sudoku {
 		for (int j = 0; j < N; j++) {
 			sb.append("[" + j + "] ");
 		}
-		sb.append('\n');
+		sb.append(System.lineSeparator());
 		for (int i = 0; i < N; i++) {
 			sb.append("[" + i + "]   ");
 			for (int j = 0; j < N; j++)
 				sb.append(mat[i][j] + "   ");
-			sb.append('\n');
+			sb.append(System.lineSeparator());
 		}
-		sb.append('\n');
+		sb.append(System.lineSeparator());
 		return sb.toString();
 	}
 	
