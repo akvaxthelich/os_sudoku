@@ -24,11 +24,11 @@ public class EchoClient {
                 System.out.println(e);
             } finally {
                 try {
-                    System.out.println("Cleaning up");
+                    // System.out.println("Cleaning up");
                     in.close();
                     System.exit(0);
                 } catch (IOException e) {
-                    System.out.println("error trying to close this");
+                    System.out.println("error trying to close the BufferReader in");
                 }
             }
         }
@@ -56,12 +56,10 @@ public class EchoClient {
             reader = new SudokuReaderThread(inSReader,echoSocket);
             reader.start();
             while (!echoSocket.isClosed() && (userInput = stdIn.readLine()) != null && !userInput.equals("exit")) {
-                System.out.println("Went through:" + echoSocket + echoSocket.isConnected());
                 out.println(userInput);
             }
             echoSocket.close();
             reader.join();
-            System.out.println("Escaped");
         } catch (UnknownHostException e) {
             System.err.println("Don't know about host " + hostName);
             System.exit(1);
@@ -71,12 +69,12 @@ public class EchoClient {
             System.exit(1);
         } catch (InterruptedException e) {
             System.out.println(e);
+            System.exit(1);
         } finally {
             try {
                 reader.join();
             } catch (InterruptedException e) {
-
-            } catch (Exception e) {
+                System.exit(1);
             }
         }
     }

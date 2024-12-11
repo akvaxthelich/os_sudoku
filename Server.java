@@ -3,7 +3,6 @@ import java.net.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.Semaphore;
-import java.util.random.RandomGenerator;
 
 public class Server {
     private ServerSocket socket;
@@ -11,7 +10,6 @@ public class Server {
     private HashMap<String, Socket> conns;
     private HashMap<String, PrintWriter> writers;
     private Semaphore gameLock;
-    private boolean dirty;
 
     // private ArrayList
     public Server(int port) throws IOException {
@@ -23,7 +21,6 @@ public class Server {
         conns = new HashMap<String, Socket>();
         writers = new HashMap<String, PrintWriter>();
 
-        dirty = false;
     }
 
     public void startAcceptingConnections() {
@@ -121,13 +118,6 @@ public class Server {
                             out.println("Invalid update command");
                             gameLock.release();
                         }
-                    } else if (input.equals("broadcast")) {
-                        for (String sureId : writers.keySet()) {
-                            System.out.println(sureId + ":" + writers.get(sureId));
-                            writers.get(sureId).println("hi");
-                            writers.get(sureId).flush();
-                            System.out.println("Finished Response");
-                        }
                     } else {
                         System.out.println("Unknown Command!:" + input);
                         out.println("Unknown command");
@@ -138,14 +128,13 @@ public class Server {
             } catch (Exception e) {
                 System.err.println(e);
             } finally {
-                try{
-
+                try {
                     System.out.println("Exited");
-                    conns.remove(id).close();;
+                    conns.remove(id).close();
                     writers.remove(id).close();
                     System.out.println(conns);
                     System.out.println(writers);
-                }catch(IOException e){
+                } catch (IOException e) {
                     System.out.println(e);
                 }
             }
