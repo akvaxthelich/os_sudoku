@@ -34,23 +34,22 @@ public class Server {
                 String id = "socket_" + (i++);
                 conns.put(id, socket.accept());
                 writers.put(id, new PrintWriter(conns.get(id).getOutputStream()));
-                // while(true){
-                // writers.get(id).println("hi");
-                // }
-
-                // System.out.println("Created socket: " + id);
-
                 Thread something = new ClientHandler(id);
                 threads.add(something);
                 something.start();
-                // PrintWriter pw = new PrintWriter(conns.get(id).getOutputStream());
-                // pw.println(id);
             } catch (IOException e) {
                 System.err.println("Server failed to start: " + e.getMessage()); //
             }
         }
         try {
             System.out.println("Cleaning up the threads");
+            for(String id:writers.keySet()){
+                PrintWriter pw = writers.get(id);
+                pw.println("Game complete! Good job everyone!");
+                pw.flush();
+                conns.get(id).close();
+                writers.get(id).close();
+            }
             for (Thread t : threads) {
                 t.join();
             }
@@ -73,15 +72,18 @@ public class Server {
                 PrintWriter out = writers.get(id);
                 String input = "";
                 while ((input = in.readLine()) != null) {
+                    System.out.println(input+":"+input.startsWith("update"));
                     if (input.equals("show")) {
                         out.write(game.getSudokuString());
                         out.flush();
                     } else if (input.startsWith("update")) {
+                        System.out.println("here to proces update");
                         try {
                             String[] command = input.split(" ");
                             int i = Integer.parseInt(command[1]);
                             int j = Integer.parseInt(command[2]);
                             int num = Integer.parseInt(command[3]);
+                            System.out.println(""+i+","+j+","+num);
                             gameLock.acquire();
                             if (game.enterNumber(i, j, num)) {
                                 out.println("Success");
@@ -91,18 +93,18 @@ public class Server {
                                     PrintWriter pw = writers.get(sureId);
                                     pw.println("Updated Sudoku Board:");
                                     pw.write(game.getSudokuString());
-                                    pw.flush();;
-
+                                    pw.flush();
                                     System.out.println("Finished Response");
                                 }
-                                gameLock.release();
                             } else {
                                 System.out.println("Fail");
-                                out.write("Fail");
+                                out.write("Fail\n");
                                 out.flush();
                             }
+                            gameLock.release();
                         } catch (NumberFormatException e) {
                             out.println("Invalid update command");
+                            gameLock.release();
                         }
                     } else if (input.equals("broadcast")) {
                         for (String sureId : writers.keySet()) {

@@ -4,9 +4,11 @@ import java.net.*;
 public class EchoClient {
     public static class SudokuReaderThread extends Thread {
         private BufferedReader in;
+        // private BufferedReader s;
 
         public SudokuReaderThread(InputStreamReader is) {
             in = new BufferedReader(is);
+            // this.s = s;
         }
 
         public void run() {
@@ -24,6 +26,9 @@ public class EchoClient {
                 try {
                     System.out.println("Cleaning up");
                     in.close();
+                    System.exit(0);
+                    // s.close();
+                    // System.setIn(new ByteArrayInputStream("exit".getBytes()));
                 } catch (IOException e) {
                     System.out.println("error trying to close this");
                 }
@@ -52,9 +57,11 @@ public class EchoClient {
             String userInput = null;
             reader = new SudokuReaderThread(inSReader);
             reader.start();
-            while ((userInput = stdIn.readLine()) != null) {
+            while (!echoSocket.isClosed() && (userInput = stdIn.readLine()) != null && !userInput.equals("exit")) {
+                System.out.println("Went through:"+echoSocket+echoSocket.isConnected());
                 out.println(userInput);
             }
+            echoSocket.close();
             reader.join();
             System.out.println("Escaped");
         } catch (UnknownHostException e) {

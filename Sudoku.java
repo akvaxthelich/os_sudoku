@@ -44,10 +44,14 @@ public class Sudoku {
 
 	// Returns false if given 3 x 3 block contains num.
 	private boolean unUsedInBox(int rowStart, int colStart, int num) {
+		System.out.println("rowStart:"+rowStart+","+"colStart:"+colStart);
 		for (int i = 0; i < SRN; i++)
 			for (int j = 0; j < SRN; j++)
-				if (mat[rowStart + i][colStart + j] == num)
+				if (mat[rowStart + i][colStart + j] == num){
+					System.out.println("Failed box check"+i+","+j+","+num+",data in mat"+mat[rowStart + i][colStart + j]+"\nrowIndex:"+(rowStart + i)+"colIndex"+(colStart + j));
 					return false;
+				}
+
 
 		return true;
 	}
@@ -79,16 +83,20 @@ public class Sudoku {
 	// check in the row for existence
 	private boolean unUsedInRow(int i, int num) {
 		for (int j = 0; j < N; j++)
-			if (mat[i][j] == num)
+			if (mat[i][j] == num){
+				System.out.println("Failed row check"+i+","+j+","+num);
 				return false;
+			}
 		return true;
 	}
 
 	// check in the row for existence
 	private boolean unUsedInCol(int j, int num) {
 		for (int i = 0; i < N; i++)
-			if (mat[i][j] == num)
+			if (mat[i][j] == num){
+				System.out.println("Failed col check"+i+","+j+","+num);
 				return false;
+			}
 		return true;
 	}
 
@@ -183,9 +191,9 @@ public class Sudoku {
 	//enterNumber(2,3,4)
 	// colStart = Math.floor(2/9); = 0
 	public boolean enterNumber(int i, int j, int num) {
-		int colStart = SRN * (int) Math.floor(i / SRN);
-		int rowStart = SRN * (int) Math.floor(j / SRN);
-		System.out.println("["+i+","+j+"]:"+colStart + "," +rowStart);
+		int rowStart = SRN * (int) Math.floor(i / SRN);
+		int colStart = SRN * (int) Math.floor(j / SRN);
+		System.out.println("["+i+","+j+"]:"+rowStart + "," +colStart);
 		if(isLocationUpdatable(i, j) && unUsedInBox(rowStart, colStart, num)){
 			if (unUsedInRow(i, num) && unUsedInCol(j, num) && (num >= 0) && (num <= 9)){ 
 				//checks row, col, box to see if num is there plus checks to see if int is between 0 to 9
