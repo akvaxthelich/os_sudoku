@@ -1,6 +1,9 @@
 import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.Queue;
 
 public class Server{
         public static void main(String[] args){
@@ -71,11 +74,18 @@ class ClientHandler extends Thread{ //we anticipate multiple clients... thus we 
             }
             while((message = inStream.readLine()) != null && !message.equals("exit")){ //read from client            
                 
-                System.out.println(username + "> " + message);
+                if(!isCommand(message)){
+                    System.out.println(username + "> " + message);
                 
-                //need arraylist tracking all users here to broadcast, otherwise this will only be sent to one client
-                for(int i = 0; i < clientHandlersArr.size(); i++){
-                    clientHandlersArr.get(i).pOut.println(username + "> " + message);
+                    //need arraylist tracking all users here to broadcast, otherwise this will only be sent to one client
+                    //broadcast
+                    for(int i = 0; i < clientHandlersArr.size(); i++){
+                        clientHandlersArr.get(i).pOut.println(username + "> " + message);
+                    }
+                        
+                }
+                else{
+                    interpretCommand(parseTokens(message));
                 }
                 
             }
@@ -93,6 +103,66 @@ class ClientHandler extends Thread{ //we anticipate multiple clients... thus we 
             }
         }
        
+    }
+
+    //take a message. if it is a command, interpret and handle the command
+    // if it is not a command, return false.
+    public boolean isCommand(String phrase){
+        if(phrase.charAt(0) == '/' && phrase.length() > 1){
+            return true;
+        }
+        return false;
+    }
+
+    //Precondition: a slash is found and we interpret each following word as a token
+    public boolean interpretCommand(Queue<String> tokens){
+
+        String command = tokens.poll();
+        //Place: /place {int: value} {int: x} {int: y}        
+        if(command.equals("place") || command.equals("update")){
+            int value = Integer.parseInt(tokens.poll());
+
+            int[] location = {Integer.parseInt(tokens.poll()), Integer.parseInt(tokens.poll()) };
+                
+            updateBoard(value, location);
+            return true;
+        }
+        //Show sudoku board.
+        else if(command.equals("show") || command.equals("board")){
+            showBoard();
+            return true;
+        }
+    return false;
+    }
+
+    public Queue<String> parseTokens(String command){
+
+        Queue<String> tokens = new LinkedList<String>();
+
+        String currToken = "";
+        //1 to skip the slash.
+        for(int i = 1; i < command.length(); i++){
+            if(command.charAt(i) == ' ' && !currToken.equalsIgnoreCase("")){
+                tokens.add(currToken);
+                currToken = "";
+                continue;
+            }
+            else{
+                currToken += command.charAt(i);
+            }
+        }
+        return tokens;
+    }
+
+    public void showBoard(){
+        System.out.println("Show board code reached.");
+        //simple print. works with either show or board.
+    }
+
+    public void updateBoard(int value, int[] pos){
+
+        System.out.println("Board update code reached.");
+        //called by both "place" and "update"
     }
     //thread class requires a run() function, and to be called with start elsewhere
 }
