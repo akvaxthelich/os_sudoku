@@ -1,87 +1,81 @@
 import java.io.*;
 import java.net.*;
-import java.util.Scanner;
 
-public class Client extends Thread{
+public class Client {
+    public static class SudokuReaderThread extends Thread {
+        private BufferedReader in;
+        Socket s;
 
-    static Socket s;
-    static BufferedReader inStream;
-    public static void main(String[] args){
-        
-        int port = Integer.parseInt(args[0]);
-        Scanner sc = new Scanner(System.in);
-        try{
-            s = new Socket("localhost", port);
+        public SudokuReaderThread(InputStreamReader is, Socket s) {
+            in = new BufferedReader(is);
+            this.s = s;
+        }
 
-            inStream = new BufferedReader(new InputStreamReader(s.getInputStream())); //input
-            PrintWriter pOut = new PrintWriter(s.getOutputStream(), true); //output, with autoflush
-            
-            System.out.println("Established connection to server on port " + port + ".");
+        public void run() {
+            try {
+                String line="";
 
-            
-            
-            System.out.println("Enter a username: ");
-            String username = sc.nextLine();
-            pOut.println(username);
-            
-            System.out.println("Welcome, " + username + ".");
-            new ClientFunctionHandler(s).start();
-            while(true){ //sending stuff out
-                
-                String message = sc.nextLine();
-                
-                if(message.equals("exit")){
-                    pOut.println("client exited");
-                    break;
+                while (s.isConnected() && (line = in.readLine()) != null) {
+                    if(line.length() > 0){
+                        System.out.println(line);
+                    }
                 }
-                pOut.println(message);
-                
-            }
-            
-            pOut.close();
-            s.close();
-            sc.close();
-            
-        }
-        catch(IOException e){
-            System.err.println("Failed to create socket.");
-        }
-
-    }
-
-
-}
-
-//made a handler class to hopefully clean up the driver code.
-
-class ClientFunctionHandler extends Thread{
-
-    BufferedReader inStream;
-    public ClientFunctionHandler(Socket s){
-        try{
-            inStream = new BufferedReader(new InputStreamReader(s.getInputStream()));
-        }
-        catch(IOException e){
-            System.err.println(e.getMessage());
-        }
-    }
-    public void waitForMessages(){
-        try{
-            String message = inStream.readLine();
-            if(message != null){
-                System.out.println(message);
+            } catch (IOException e) {
+                System.out.println(e);
+            } finally {
+                try {
+                    // System.out.println("Cleaning up");
+                    in.close();
+                    System.exit(0);
+                } catch (IOException e) {
+                    System.out.println("error trying to close the BufferReader in");
+                }
             }
         }
-        catch(IOException e){
-
-        }
-    }
-
-    public void run(){
-        while(true){
-            waitForMessages();
-        }
 
     }
-    
+
+    public static void main(String[] args) throws IOException {
+
+        if (args.length != 2) {
+            System.err.println(
+                    "Usage: java EchoClient <host name> <port number>");
+            System.exit(1);
+        }
+
+        String hostName = args[0];
+        int portNumber = Integer.parseInt(args[1]);
+        Thread reader = null;
+        try (
+                Socket echoSocket = new Socket(hostName, portNumber);
+                PrintWriter out = new PrintWriter(echoSocket.getOutputStream(), true);
+                InputStreamReader inSReader = new InputStreamReader(echoSocket.getInputStream());
+                BufferedReader stdIn = new BufferedReader(
+                        new InputStreamReader(System.in))) {
+            String userInput = null;
+            reader = new SudokuReaderThread(inSReader,echoSocket);
+            reader.start();
+            while (!echoSocket.isClosed() && (userInput = stdIn.readLine()) != null && !userInput.equals("exit")) {
+                out.println(userInput);
+            }
+            echoSocket.close();
+            reader.join();
+        } catch (UnknownHostException e) {
+            System.err.println("Don't know about host " + hostName);
+            System.exit(1);
+        } catch (IOException e) {
+            System.err.println("Couldn't get I/O for the connection to " +
+                    hostName);
+            System.exit(1);
+        } catch (InterruptedException e) {
+            System.out.println(e);
+            System.exit(1);
+        } finally {
+            try {
+                reader.join();
+            } catch (InterruptedException e) {
+                System.exit(1);
+            }
+        }
+    }
 }
