@@ -72,7 +72,6 @@ public class Server {
                     BufferedReader in = new BufferedReader(new InputStreamReader(conns.get(id).getInputStream()));) {
                 PrintWriter out = writers.get(id);
                 String input = "";
-                // System.out.println(in.readLine());
                 while ((input = in.readLine()) != null) {
                     if (input.equals("show")) {
                         out.write(game.getSudokuString());
@@ -132,13 +131,9 @@ public class Server {
     }
     public static void main(String[] args) {
         int port = Integer.parseInt(args[0]);
-        // // Shared state between each thread
-        // Sudoku game = new Sudoku();
-        // Semaphore gameLock = new Semaphore(1);
-
         try {
             Server s = new Server(port);
-            // Since 
+            // Since the server shares state with all of the threads we needed a function to spin up the threads within the class itself.
             s.startAcceptingConnections();
         } catch (IOException e) {
             System.err.println("Server failed to start: " + e.getMessage()); // err.println can use to signify diff
