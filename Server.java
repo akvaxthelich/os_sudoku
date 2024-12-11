@@ -79,7 +79,7 @@ public class Server {
             try (
                     BufferedReader in = new BufferedReader(new InputStreamReader(conns.get(id).getInputStream()));) {
                 PrintWriter out = writers.get(id);
-                gameOver();
+                // gameOver();
                 String input = "";
                 while ((input = in.readLine()) != null) {
                     System.out.println(input + ":" + input.startsWith("update"));
@@ -106,6 +106,8 @@ public class Server {
                                     pw.flush();
                                     System.out.println("Finished Response");
                                 }
+                                System.out.println(game.isBoardFull());
+                                System.out.println(game.missingLoc);
                                 if (game.isBoardFull()) {
                                     gameOver();
                                 }

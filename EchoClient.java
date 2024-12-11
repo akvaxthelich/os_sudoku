@@ -4,22 +4,22 @@ import java.net.*;
 public class EchoClient {
     public static class SudokuReaderThread extends Thread {
         private BufferedReader in;
-        // private BufferedReader s;
+        Socket s;
 
-        public SudokuReaderThread(InputStreamReader is) {
+        public SudokuReaderThread(InputStreamReader is, Socket s) {
             in = new BufferedReader(is);
-            // this.s = s;
+            this.s = s;
         }
 
         public void run() {
             try {
-                String line;
-                while (true) {
-                    while ((line = in.readLine()) != null && line.length() > 0) {
+                String line="";
+
+                while (s.isConnected() && (line = in.readLine()) != null) {
+                    if(line.length() > 0){
                         System.out.println(line);
                     }
                 }
-
             } catch (IOException e) {
                 System.out.println(e);
             } finally {
@@ -27,8 +27,6 @@ public class EchoClient {
                     System.out.println("Cleaning up");
                     in.close();
                     System.exit(0);
-                    // s.close();
-                    // System.setIn(new ByteArrayInputStream("exit".getBytes()));
                 } catch (IOException e) {
                     System.out.println("error trying to close this");
                 }
@@ -55,10 +53,10 @@ public class EchoClient {
                 BufferedReader stdIn = new BufferedReader(
                         new InputStreamReader(System.in))) {
             String userInput = null;
-            reader = new SudokuReaderThread(inSReader);
+            reader = new SudokuReaderThread(inSReader,echoSocket);
             reader.start();
             while (!echoSocket.isClosed() && (userInput = stdIn.readLine()) != null && !userInput.equals("exit")) {
-                System.out.println("Went through:"+echoSocket+echoSocket.isConnected());
+                System.out.println("Went through:" + echoSocket + echoSocket.isConnected());
                 out.println(userInput);
             }
             echoSocket.close();

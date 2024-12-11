@@ -198,6 +198,8 @@ public class Sudoku {
 			if (unUsedInRow(i, num) && unUsedInCol(j, num) && (num >= 0) && (num <= 9)){ 
 				//checks row, col, box to see if num is there plus checks to see if int is between 0 to 9
 				mat[i][j] = num; //if it is put it in
+				missingLoc.remove(i+"-"+j);
+				this.R--;
 				return true;
 			}
 			else { //if not, you can't enter number
