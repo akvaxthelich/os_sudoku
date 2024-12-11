@@ -1,6 +1,5 @@
 import java.io.*;
 import java.net.*;
-import java.util.concurrent.TimeUnit;
 
 public class EchoClient {
     public static class SudokuReaderThread extends Thread {
@@ -13,7 +12,6 @@ public class EchoClient {
         public void run() {
             try {
                 String line;
-                // this.wait();
                 while (true) {
                     while ((line = in.readLine()) != null && line.length() > 0) {
                         System.out.println(line);
@@ -44,7 +42,6 @@ public class EchoClient {
 
         String hostName = args[0];
         int portNumber = Integer.parseInt(args[1]);
-        // Semaphore
         Thread reader = null;
         try (
                 Socket echoSocket = new Socket(hostName, portNumber);
