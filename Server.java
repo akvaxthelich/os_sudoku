@@ -35,7 +35,7 @@ public class Server {
                 conns.put(id, socket.accept());
                 writers.put(id, new PrintWriter(conns.get(id).getOutputStream()));
                 // while(true){
-                //     writers.get(id).println("hi");
+                // writers.get(id).println("hi");
                 // }
 
                 // System.out.println("Created socket: " + id);
@@ -50,6 +50,7 @@ public class Server {
             }
         }
         try {
+            System.out.println("Cleaning up the threads");
             for (Thread t : threads) {
                 t.join();
             }
@@ -73,12 +74,9 @@ public class Server {
                 String input = "";
                 // System.out.println(in.readLine());
                 while ((input = in.readLine()) != null) {
-                    System.out.println("Does this run all of the time?");
                     if (input.equals("show")) {
-                        System.out.println("here?");
                         out.write(game.getSudokuString());
                         out.flush();
-                        System.out.println("Finish Response");
                     } else if (input.startsWith("update")) {
                         try {
                             String[] command = input.split(" ");
@@ -87,27 +85,37 @@ public class Server {
                             int num = Integer.parseInt(command[3]);
                             gameLock.acquire();
                             if (game.enterNumber(i, j, num)) {
-                                System.out.println("Success");
-                                // out.println(game.getSudokuString());
+                                out.println("Success");
+                                out.flush();
                                 for (String sureId : writers.keySet()) {
                                     System.out.println(sureId + ":" + writers.get(sureId));
-                                    writers.get(sureId).write(game.getSudokuString());
-                                    writers.get(sureId).flush();
+                                    PrintWriter pw = writers.get(sureId);
+                                    pw.println("Updated Sudoku Board:");
+                                    pw.write(game.getSudokuString());
+                                    pw.flush();;
+
                                     System.out.println("Finished Response");
                                 }
                                 gameLock.release();
                             } else {
                                 System.out.println("Fail");
-                                out.println("Fail");
+                                out.write("Fail");
+                                out.flush();
                             }
                         } catch (NumberFormatException e) {
                             out.println("Invalid update command");
                         }
+                    } else if (input.equals("broadcast")) {
+                        for (String sureId : writers.keySet()) {
+                            System.out.println(sureId + ":" + writers.get(sureId));
+                            writers.get(sureId).println("hi");
+                            writers.get(sureId).flush();
+                            System.out.println("Finished Response");
+                        }
                     } else {
+                        System.out.println("Unknown Command!:"+input);
                         out.println("Unknown command");
-                        // out.flush();
                     }
-                    // out.flush();
                 }
             } catch (IOException e) {
                 System.err.println("Server failed to start: " + e.getMessage());
@@ -116,13 +124,12 @@ public class Server {
             } finally {
                 System.out.println("Exited");
                 conns.remove(id);
+                writers.remove(id);
                 System.out.println(conns);
             }
         }
 
     }
-
-    // public static class ClientHandler extends T
     public static void main(String[] args) {
         int port = Integer.parseInt(args[0]);
         // // Shared state between each thread
@@ -131,20 +138,9 @@ public class Server {
 
         try {
             Server s = new Server(port);
+            // Since 
             s.startAcceptingConnections();
-            // ServerSocket serverSocket = new ServerSocket(port);
-            // System.out.println("Server successfully started at: " +
-            // serverSocket.getLocalSocketAddress());
-
-            // while(true){
-            // Socket clientSocket = serverSocket.accept();
-            // System.out.println("Connection from client: '" +
-            // clientSocket.getInetAddress() + "' established.");
-            // // Each client handler needs an instance of the game
-            // new ClientHandler(clientSocket).start();
-            // }
         } catch (IOException e) {
-
             System.err.println("Server failed to start: " + e.getMessage()); // err.println can use to signify diff
                                                                              // between regular output
 
@@ -153,69 +149,3 @@ public class Server {
     }
 
 }
-
-// need a way to manage incoming messages/connections with the clients
-// themselves, and interpret the data each client sends
-// example: put thing at spot 1 or 2, ok!
-
-//
-// class ClientHandler extends Thread { // we anticipate multiple clients...
-// thus we need multiple threads to take care
-// // of them.
-
-// private Socket clientSocket;
-
-// public ClientHandler(Socket s) {
-// clientSocket = s;
-// }
-
-// public void run() {
-// // need to use two parts of the IO built into java to buffer, then print out
-// the
-// // data stream that the client will send via TCP
-// try (
-// BufferedReader inStream = new BufferedReader(new
-// InputStreamReader(clientSocket.getInputStream()));
-// PrintWriter pOut = new PrintWriter(clientSocket.getOutputStream(), true);) {
-// // When user connects we send them
-// String message;
-// // will buffer the input from the specified file.
-// // Without buffering, each invocation of read() or readLine() could cause
-// bytes
-// // to be read from the file, converted into characters, and then returned,
-// which
-// // can be very inefficient.
-// // username grab
-// String username = "anon";
-
-// if ((message = inStream.readLine()) != null) {
-// username = message;
-// System.out.println("Client at " + clientSocket.getInetAddress() +
-// "chose name '" + username + "'.");
-// }
-// while ((message = inStream.readLine()) != null && !message.equals("exit")) {
-// // read from client
-// System.out.println(username + "> " + message);
-
-// // need arraylist tracking all users here to broadcast, otherwise this will
-// only
-// // be sent to one client
-// pOut.println(username + "> " + message); // TODO half done, currently users
-// cannot see other user
-// // messages.
-// }
-
-// } catch (IOException e) {
-// System.err.println(e);
-// } finally { // attempt to close the client socket
-// try {
-// clientSocket.close();
-// } catch (IOException e) {
-// System.err.println(e);
-// }
-// }
-
-// }
-// // thread class requires a run() function, and to be called with start
-// elsewhere
-// }

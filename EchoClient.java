@@ -15,18 +15,13 @@ public class EchoClient {
                 String line;
                 // this.wait();
                 while (true) {
-                    while(in.ready()){
-                        System.out.println("hi?");
-                        while ((line = in.readLine()) != null && line.length() > 0) {
-                            System.out.println("running");
-                            System.out.println(line);
-                        }
+                    while ((line = in.readLine()) != null && line.length() > 0) {
+                        System.out.println(line);
                     }
-                    TimeUnit.SECONDS.sleep(1);
                 }
+
             } catch (IOException e) {
                 System.out.println(e);
-            } catch (InterruptedException e) {
             } finally {
                 try {
                     System.out.println("Cleaning up");
@@ -58,12 +53,9 @@ public class EchoClient {
                 BufferedReader stdIn = new BufferedReader(
                         new InputStreamReader(System.in))) {
             String userInput = null;
-            out.println("hi");
             reader = new SudokuReaderThread(inSReader);
-            reader.run();
-            System.out.println("hello?");
+            reader.start();
             while ((userInput = stdIn.readLine()) != null) {
-                System.out.println("here");
                 out.println(userInput);
             }
             reader.join();
