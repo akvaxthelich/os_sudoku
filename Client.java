@@ -13,10 +13,10 @@ public class Client {
 
         public void run() {
             try {
-                String line="";
+                String line = "";
 
                 while (s.isConnected() && (line = in.readLine()) != null) {
-                    if(line.length() > 0){
+                    if (line.length() > 0) {
                         System.out.println(line);
                     }
                 }
@@ -33,6 +33,38 @@ public class Client {
             }
         }
 
+    }
+
+    public static boolean isValidCommand(String cmd) {
+        if (cmd.equals("show") || cmd.equals("exit")) {
+            return true;
+        } else if (cmd.startsWith("update")) {
+            try {
+                String[] command = cmd.split("( )+");
+                if (command.length != 4) {
+                    System.out.println(
+                            "Wrong Number of Arguments.\nUsage: update <i> <j> <num>. i, j, and num are integers.");
+                    return false;
+                }
+                int i = Integer.parseInt(command[1]);
+                int j = Integer.parseInt(command[2]);
+                int num = Integer.parseInt(command[3]);
+                if (!(i >= 0 && i <= 8) || !(j >= 0 && j <= 8)) {
+                    System.out.println("");
+                    return false;
+                }
+                if (!(num >= 1 && num <= 9)) {
+                    System.out.println("Error: Number you're trying to insert must be between 1 and 9!");
+                    return false;
+                }
+                return true;
+            } catch (NumberFormatException e) {
+                System.out.println("One of your 3 arguments is not a integer.");
+            } catch (Exception e) {
+                System.out.println("Something went wrong");
+            }
+        }
+        return false;
     }
 
     public static void main(String[] args) throws IOException {
@@ -52,11 +84,18 @@ public class Client {
                 InputStreamReader inSReader = new InputStreamReader(echoSocket.getInputStream());
                 BufferedReader stdIn = new BufferedReader(
                         new InputStreamReader(System.in))) {
+            System.out.println("Established connection to server " + echoSocket.getInetAddress() + ":"
+                    + echoSocket.getPort());
             String userInput = null;
-            reader = new SudokuReaderThread(inSReader,echoSocket);
+            reader = new SudokuReaderThread(inSReader, echoSocket);
             reader.start();
             while (!echoSocket.isClosed() && (userInput = stdIn.readLine()) != null && !userInput.equals("exit")) {
-                out.println(userInput);
+                if (isValidCommand(userInput.trim())) {
+                    out.println(userInput);
+                    System.out.println("test");
+                } else {
+                    System.out.println("Invalid Command From Client Validation?");
+                }
             }
             echoSocket.close();
             reader.join();
