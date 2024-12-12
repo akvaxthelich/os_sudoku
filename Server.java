@@ -86,7 +86,7 @@ public class Server {
                     } else if (input.startsWith("update")) {
                         System.out.println("here to proces update");
                         try {
-                            String[] command = input.split(" ");
+                            String[] command = input.split("( )+");
                             int i = Integer.parseInt(command[1]);
                             int j = Integer.parseInt(command[2]);
                             int num = Integer.parseInt(command[3]);
@@ -121,6 +121,7 @@ public class Server {
                     } else {
                         System.out.println("Unknown Command!:" + input);
                         out.println("Unknown command");
+                        out.flush();
                     }
                 }
             } catch (IOException e) {
