@@ -44,11 +44,9 @@ public class Sudoku {
 
 	// Returns false if given 3 x 3 block contains num.
 	private boolean unUsedInBox(int rowStart, int colStart, int num) {
-		System.out.println("rowStart:"+rowStart+","+"colStart:"+colStart);
 		for (int i = 0; i < SRN; i++)
 			for (int j = 0; j < SRN; j++)
 				if (mat[rowStart + i][colStart + j] == num){
-					System.out.println("Failed box check"+i+","+j+","+num+",data in mat"+mat[rowStart + i][colStart + j]+"\nrowIndex:"+(rowStart + i)+"colIndex"+(colStart + j));
 					return false;
 				}
 
@@ -84,7 +82,6 @@ public class Sudoku {
 	private boolean unUsedInRow(int i, int num) {
 		for (int j = 0; j < N; j++)
 			if (mat[i][j] == num){
-				System.out.println("Failed row check"+i+","+j+","+num);
 				return false;
 			}
 		return true;
@@ -94,7 +91,6 @@ public class Sudoku {
 	private boolean unUsedInCol(int j, int num) {
 		for (int i = 0; i < N; i++)
 			if (mat[i][j] == num){
-				System.out.println("Failed col check"+i+","+j+","+num);
 				return false;
 			}
 		return true;
